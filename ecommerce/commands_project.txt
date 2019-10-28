@@ -1,0 +1,15 @@
+   58  npm install --save lodash
+   80  npm install --save json-server
+   94  npm install --save axios redux-thunk
+   97  npm install --save axios redux-thunk
+  363  npm i express dotenv nodemon
+  373  npm -i mongoose
+  374  npm i mongoose
+  421  npm install express-jwt jsonwebtoken
+  422  npm i express-jwt jsonwebtoken
+  428  npm i jsonwebtoken
+  448  npm i body-parser morgan
+  455  npm i cookie-parser
+  456  npm i uuid
+  457  npm i express-validator
+  458  npm install jsonwebtoken --save
