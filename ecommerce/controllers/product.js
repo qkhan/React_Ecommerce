@@ -5,7 +5,9 @@ const { errorHandler } = require("../helpers/dbErrorHandler");
 const Product = require("../models/product");
 
 exports.productById = (req, res, next, id) => {
-    Product.findById(id).exec( (err, product) => {
+    Product.findById(id)
+      .populate("category")
+      .exec( (err, product) => {
        if (err || !product) {
          return res.status(400).json({
            error: "Product not found"
@@ -245,4 +247,56 @@ exports.photo = (req, res, next) => {
     return res.send(req.product.photo.data);
   }
   next();
+};
+
+exports.listSearch = (req, res) => {
+  console.log(" I am in list Search");
+  console.log(req.query);
+  //create query object to hold search value and category value
+  const query = {};
+  //assign search value to query.Name
+  if (req.query.search) {
+      query.name = {$regex: req.query.search, $options: 'i'}
+      //query.name = { $regex: '/req.query.search/i' }
+      //assign category value to query.category
+      if (req.query.category && req.query.category != 'All') {
+        query.category = req.query.category
+      }
+      //find the product based on query object with 2 properties
+      //search and category
+      console.log(query);
+      Product.find(query, (err, products) => {
+        if (err) {
+          console.log("Error");
+          console.log(err);
+          return res.status(400).json({
+            error: errorHandler(err)
+          })
+        }
+        console.log("Products");
+        console.log(products);
+        res.json(products)
+      }).select('-photo')
+  }
+}
+
+
+exports.decreaseQuantity = (req, res, next) => {
+  let bulkOps = req.body.order.products.map(item => {
+    return {
+      updateOne: {
+        filter: { _id: item._id},
+        update: { $inc: { quantity: -item.count, sold: +item.count }}
+      }
+    };
+  });
+
+  Product.bulkWrite(bulkOps, {}, (error, products) => {
+    if (error) {
+      return res.status(400).json({
+        error: "Could not update product"
+      });
+    }
+    next();
+  });
 };
